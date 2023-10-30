@@ -22,6 +22,10 @@ fabric_name: FABRIC
 underlay_routing_protocol: ebgp
 overlay_routing_protocol: ebgp
 
+# EVPN Multicast Fabric Settings
+underlay_multicast: true
+evpn_multicast: true
+
 # Local users
 local_users:
   # Define a new user, which is called "ansible"

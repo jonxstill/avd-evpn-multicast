@@ -157,6 +157,10 @@ static_routes:
   gateway: 172.16.1.1
 service_routing_protocols_model: multi-agent
 ip_routing: true
+router_multicast:
+  ipv4:
+    routing: true
+    software_forwarding: sfe
 daemon_terminattr:
   cvaddrs:
   - 192.168.1.12:9910
@@ -256,6 +260,9 @@ vlan_interfaces:
   shutdown: false
   mtu: 1500
   ip_address: 10.255.1.97/31
+  pim:
+    ipv4:
+      sparse_mode: true
 - name: Vlan4094
   description: MLAG_PEER
   shutdown: false
@@ -357,6 +364,9 @@ ethernet_interfaces:
   mtu: 1500
   type: routed
   ip_address: 10.255.255.5/31
+  pim:
+    ipv4:
+      sparse_mode: true
 - name: Ethernet2
   peer: dc1-spine2
   peer_interface: Ethernet2
@@ -366,6 +376,9 @@ ethernet_interfaces:
   mtu: 1500
   type: routed
   ip_address: 10.255.255.7/31
+  pim:
+    ipv4:
+      sparse_mode: true
 - name: Ethernet8
   peer: dc1-leaf1c
   peer_interface: Ethernet2
@@ -446,7 +459,8 @@ vxlan_interface:
     description: dc1-leaf1b_VTEP
     vxlan:
       udp_port: 4789
-      source_interface: Loopback1
+      source_interface: Loopback0
+      mlag_source_interface: Loopback1
       virtual_router_encapsulation_mac_address: mlag-system-id
       vlans:
       - id: 11
