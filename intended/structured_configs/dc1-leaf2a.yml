@@ -82,6 +82,7 @@ router_bgp:
         - '10:10'
     redistribute_routes:
     - source_protocol: connected
+    evpn_multicast: true
     neighbors:
     - ip_address: 10.255.1.101
       peer_group: MLAG-IPv4-UNDERLAY-PEER
@@ -99,6 +100,7 @@ router_bgp:
         - '11:11'
     redistribute_routes:
     - source_protocol: connected
+    evpn_multicast: true
     neighbors:
     - ip_address: 10.255.1.101
       peer_group: MLAG-IPv4-UNDERLAY-PEER
@@ -161,6 +163,13 @@ router_multicast:
   ipv4:
     routing: true
     software_forwarding: sfe
+  vrfs:
+  - name: VRF10
+    ipv4:
+      routing: true
+  - name: VRF11
+    ipv4:
+      routing: true
 daemon_terminattr:
   cvaddrs:
   - 192.168.1.12:9910
@@ -274,12 +283,20 @@ vlan_interfaces:
   description: VRF10_VLAN11
   shutdown: false
   ip_address_virtual: 10.10.11.1/24
+  pim:
+    ipv4:
+      sparse_mode: true
+      local_interface: Loopback10
   vrf: VRF10
 - name: Vlan12
   tenant: TENANT1
   description: VRF10_VLAN12
   shutdown: false
   ip_address_virtual: 10.10.12.1/24
+  pim:
+    ipv4:
+      sparse_mode: true
+      local_interface: Loopback10
   vrf: VRF10
 - name: Vlan3009
   tenant: TENANT1
@@ -294,12 +311,20 @@ vlan_interfaces:
   description: VRF11_VLAN21
   shutdown: false
   ip_address_virtual: 10.10.21.1/24
+  pim:
+    ipv4:
+      sparse_mode: true
+      local_interface: Loopback11
   vrf: VRF11
 - name: Vlan22
   tenant: TENANT1
   description: VRF11_VLAN22
   shutdown: false
   ip_address_virtual: 10.10.22.1/24
+  pim:
+    ipv4:
+      sparse_mode: true
+      local_interface: Loopback11
   vrf: VRF11
 - name: Vlan3010
   tenant: TENANT1
@@ -478,8 +503,10 @@ vxlan_interface:
       vrfs:
       - name: VRF10
         vni: 10
+        multicast_group: 232.0.32.10
       - name: VRF11
         vni: 11
+        multicast_group: 232.0.32.11
 virtual_source_nat_vrfs:
 - name: VRF10
   ip_address: 10.255.10.5

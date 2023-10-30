@@ -496,24 +496,32 @@ interface Vlan11
    description VRF10_VLAN11
    no shutdown
    vrf VRF10
+   pim ipv4 sparse-mode
+   pim ipv4 local-interface Loopback10
    ip address virtual 10.10.11.1/24
 !
 interface Vlan12
    description VRF10_VLAN12
    no shutdown
    vrf VRF10
+   pim ipv4 sparse-mode
+   pim ipv4 local-interface Loopback10
    ip address virtual 10.10.12.1/24
 !
 interface Vlan21
    description VRF11_VLAN21
    no shutdown
    vrf VRF11
+   pim ipv4 sparse-mode
+   pim ipv4 local-interface Loopback11
    ip address virtual 10.10.21.1/24
 !
 interface Vlan22
    description VRF11_VLAN22
    no shutdown
    vrf VRF11
+   pim ipv4 sparse-mode
+   pim ipv4 local-interface Loopback11
    ip address virtual 10.10.22.1/24
 !
 interface Vlan3009
@@ -571,8 +579,8 @@ interface Vlan4094
 
 | VRF | VNI | Multicast Group |
 | ---- | --- | --------------- |
-| VRF10 | 10 | - |
-| VRF11 | 11 | - |
+| VRF10 | 10 | 232.0.32.10 |
+| VRF11 | 11 | 232.0.32.11 |
 
 #### VXLAN Interface Device Configuration
 
@@ -592,6 +600,8 @@ interface Vxlan1
    vxlan vrf VRF10 vni 10
    vxlan vrf VRF11 vni 11
    vxlan mlag source-interface Loopback1
+   vxlan vrf VRF10 multicast group 232.0.32.10
+   vxlan vrf VRF11 multicast group 232.0.32.11
 ```
 
 ## Routing
@@ -742,10 +752,10 @@ ip route vrf MGMT 0.0.0.0/0 172.16.1.1
 
 #### Router BGP VRFs
 
-| VRF | Route-Distinguisher | Redistribute |
-| --- | ------------------- | ------------ |
-| VRF10 | 10.255.0.3:10 | connected |
-| VRF11 | 10.255.0.3:11 | connected |
+| VRF | Route-Distinguisher | Redistribute | EVPN Multicast |
+| --- | ------------------- | ------------ | -------------- |
+| VRF10 | 10.255.0.3:10 | connected | IPv4: True<br>Transit: False |
+| VRF11 | 10.255.0.3:11 | connected | IPv4: True<br>Transit: False |
 
 #### Router BGP Device Configuration
 
@@ -830,6 +840,7 @@ router bgp 65101
    !
    vrf VRF10
       rd 10.255.0.3:10
+      evpn multicast
       route-target import evpn 10:10
       route-target export evpn 10:10
       router-id 10.255.0.3
@@ -838,6 +849,7 @@ router bgp 65101
    !
    vrf VRF11
       rd 10.255.0.3:11
+      evpn multicast
       route-target import evpn 11:11
       route-target export evpn 11:11
       router-id 10.255.0.3
@@ -885,6 +897,13 @@ router bfd
 - Routing for IPv4 multicast is enabled.
 - Software forwarding by the Software Forwarding Engine (SFE)
 
+#### IP Router Multicast VRFs
+
+| VRF Name | Multicast Routing |
+| -------- | ----------------- |
+| VRF10 | enabled |
+| VRF11 | enabled |
+
 #### Router Multicast Device Configuration
 
 ```eos
@@ -893,6 +912,14 @@ router multicast
    ipv4
       routing
       software-forwarding sfe
+   !
+   vrf VRF10
+      ipv4
+         routing
+   !
+   vrf VRF11
+      ipv4
+         routing
 ```
 
 
@@ -904,6 +931,10 @@ router multicast
 | -------------- | -------- | ---------- | ----------- | --------------- |
 | Ethernet1 | - | IPv4 | - | - |
 | Ethernet2 | - | IPv4 | - | - |
+| Vlan11 | VRF10 | IPv4 | - | Loopback10 |
+| Vlan12 | VRF10 | IPv4 | - | Loopback10 |
+| Vlan21 | VRF11 | IPv4 | - | Loopback11 |
+| Vlan22 | VRF11 | IPv4 | - | Loopback11 |
 | Vlan4093 | - | IPv4 | - | - |
 
 ## Filters
